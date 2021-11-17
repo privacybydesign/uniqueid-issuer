@@ -36,6 +36,8 @@ Using a JSON configuration file:
     // Must be part of the same credential type
     "username_attr": "irma-demo.anonid.anonid.username",
     "client_attr": "irma-demo.anonid.anonid.website",
+    
+    "username_length": 12, // default value
 
     "listen_addr": "0.0.0.0",
     "port": 1234,

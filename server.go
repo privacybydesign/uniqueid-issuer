@@ -13,8 +13,17 @@ import (
 )
 
 const (
-	usernameCharset       = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-	usernameLength  int64 = 12
+	// If d is the amount of possible usernames and n is the amount of generated usernames, then the
+	// chance p that one or more usernames is generated twice ore more is approximately the
+	// following, according to the generalized birthday problem
+	// (https://en.wikipedia.org/wiki/Birthday_problem):
+	//    p = 1 - e^(-n^2/(2d))
+	// 12 characters using 62 characters gives d = 62^12. For n = 10^6, this results in a chance of
+	// about 1.55 in 10 billion of duplicates:
+	//    p = 1 - e^(-(10^6)^2/(2*62^12)) = 1.55 * 10^(-10)
+	usernameDefaultLength = 12
+
+	usernameCharset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 )
 
 type Server struct {
@@ -48,7 +57,7 @@ func (s *Server) handleSession(w http.ResponseWriter, r *http.Request) {
 
 	s.conf.Logger.WithField("client", client).Info("handling request")
 
-	username, err := newUsername()
+	username, err := newUsername(s.conf.UsernameLength)
 	if err != nil {
 		_ = server.LogError(err)
 		w.WriteHeader(500)
@@ -98,14 +107,14 @@ func (s *Server) startSession(username, client string) ([]byte, error) {
 	return bts, nil
 }
 
-func newUsername() (string, error) {
-	r := make([]byte, usernameLength)
+func newUsername(length uint) (string, error) {
+	r := make([]byte, length)
 	_, err := rand.Read(r)
 	if err != nil {
 		return "", err
 	}
 
-	b := make([]byte, usernameLength)
+	b := make([]byte, length)
 	for i := range b {
 		b[i] = usernameCharset[r[i]%byte(len(usernameCharset))]
 	}

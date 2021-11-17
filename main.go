@@ -19,6 +19,8 @@ type Configuration struct {
 	ClientAttr   irma.AttributeTypeIdentifier `json:"client_attr"`
 	UsernameAttr irma.AttributeTypeIdentifier `json:"username_attr"`
 
+	UsernameLength uint `json:"username_length"`
+
 	ListenAddress string            `json:"listen_addr"`
 	Port          uint              `json:"port"`
 	Clients       map[string]string `json:"clients"`
@@ -94,6 +96,10 @@ func checkConfig(conf *Configuration) {
 		if !credtype.ContainsAttribute(attr) {
 			die(fmt.Sprintf("credential type %s has no attribute %s", credid, attr.Name()), nil)
 		}
+	}
+
+	if conf.UsernameLength == 0 {
+		conf.UsernameLength = usernameDefaultLength
 	}
 }
 
