@@ -4,6 +4,7 @@ import (
 	"crypto/rand"
 	"encoding/json"
 	"fmt"
+	"math/bits"
 	"net/http"
 
 	"github.com/go-chi/chi"
@@ -107,16 +108,47 @@ func (s *Server) startSession(username, client string) ([]byte, error) {
 	return bts, nil
 }
 
+// randomNumbers returns a slice of integers below the specified maximum of the specified length,
+// where each number between 0 and max-1 (inclusive) is chosen with equal probability.
+func randomNumbers(length uint, max uint8) ([]uint8, error) {
+	var (
+		ints = make([]uint8, 0, length)
+		bts  []byte
+		num  uint8
+		mask uint8 = 1<<bits.Len8(max) - 1 // in binary: "bits.Len8(max)" consecutive 1's
+	)
+
+	for len(ints) < int(length) {
+		// generate a bunch of new random bytes if we've run out
+		if len(bts) == 0 {
+			bts = make([]byte, 10)
+			_, err := rand.Read(bts)
+			if err != nil {
+				return nil, err
+			}
+		}
+
+		num, bts = bts[0], bts[1:] // pop off the first byte
+		num &= mask                // throw away unnecessary bits
+
+		if num >= max {
+			continue
+		}
+		ints = append(ints, num)
+	}
+
+	return ints, nil
+}
+
 func newUsername(length uint) (string, error) {
-	r := make([]byte, length)
-	_, err := rand.Read(r)
+	r, err := randomNumbers(length, byte(len(usernameCharset)))
 	if err != nil {
 		return "", err
 	}
 
 	b := make([]byte, length)
 	for i := range b {
-		b[i] = usernameCharset[r[i]%byte(len(usernameCharset))]
+		b[i] = usernameCharset[r[i]]
 	}
 	return string(b), nil
 }
