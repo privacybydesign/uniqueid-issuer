@@ -38,7 +38,7 @@ func start(conf *Configuration) error {
 
 	handler := chi.NewMux()
 	if s.conf.Verbose == 2 {
-		handler.Use(server.LogMiddleware("username-issuer", server.LogOptions{Response: true}))
+		handler.Use(server.LogMiddleware("anonid-issuer", server.LogOptions{Response: true}))
 	}
 	handler.Mount("/irma/", irmaserver.HandlerFunc())
 	handler.Post("/session", s.handleSession)
