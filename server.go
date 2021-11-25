@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"math/bits"
 	"net/http"
+	"time"
 
 	"github.com/go-chi/chi"
 	irma "github.com/privacybydesign/irmago"
@@ -81,9 +82,12 @@ func (s *Server) handleSession(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) startSession(username, client string) ([]byte, error) {
+	// Set the expiry to 10 years from now; these attributes don't really expire in the usual sense
+	validity := time.Now().AddDate(10, 0, 0)
 	credid := s.conf.UsernameAttr.CredentialTypeIdentifier()
 	request := irma.NewIssuanceRequest([]*irma.CredentialRequest{{
 		CredentialTypeID: credid,
+		Validity:         (*irma.Timestamp)(&validity),
 		Attributes: map[string]string{
 			s.conf.UsernameAttr.Name(): username,
 			s.conf.ClientAttr.Name():   client,
