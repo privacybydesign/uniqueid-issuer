@@ -8,7 +8,7 @@ This project contains a HTTP server which issues an IRMA credential containing a
 
 1. The client starts the session by invoking `POST /session`, authenticating itself using a preshared token in the `Authorization` HTTP header.
 2. Using a [builtin IRMA server library](https://irma.app/docs/irma-server-lib/), this server starts an issuance session for a credential containing a new random username, and the client's name as specified by the configuration (see below). It responds to the client with an [IRMA session package](https://irma.app/docs/api-irma-server/#post-session), who forwards it to its frontend. The [`irma-frontend`](https://irma.app/docs/irma-frontend/) library of the client's frontend uses that to show a QR code or universal link for the user's IRMA app.
-4. The user's IRMA app and this server perform the issuance session.
+3. The user's IRMA app and this server perform the issuance session.
 
 ## Getting Started
 
