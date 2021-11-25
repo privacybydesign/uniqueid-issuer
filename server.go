@@ -112,8 +112,9 @@ func (s *Server) startSession(username, client string) ([]byte, error) {
 	return bts, nil
 }
 
-// randomNumbers returns a slice of integers below the specified maximum of the specified length,
-// where each number between 0 and max-1 (inclusive) is chosen with equal probability.
+// randomNumbers returns a slice of random integers of the length specified by the first parameter,
+// each of them being smaller than the maximum specified by the second parameter, where each number
+// between 0 and max-1 (inclusive) is chosen with equal probability.
 func randomNumbers(length uint, max uint8) ([]uint8, error) {
 	var (
 		ints = make([]uint8, 0, length)
