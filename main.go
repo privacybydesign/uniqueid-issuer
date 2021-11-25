@@ -13,6 +13,8 @@ import (
 
 var logger = server.NewLogger(0, false, false)
 
+const authTokenMinLength = 20
+
 type Configuration struct {
 	*server.Configuration
 
@@ -58,6 +60,13 @@ func checkConfig(conf *Configuration) {
 	for auth, client := range conf.Clients {
 		if client == "" {
 			die(fmt.Sprintf("client with authorization token %s has empty name", auth), nil)
+		}
+		if len(auth) < authTokenMinLength {
+			msg := fmt.Sprintf(
+				"client %s has authentication token of length %d, should have at least length %d",
+				client, len(auth), authTokenMinLength,
+			)
+			die(msg, nil)
 		}
 	}
 
