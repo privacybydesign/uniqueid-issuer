@@ -46,13 +46,18 @@ Using a JSON configuration file:
             "name": "Client name (appears in 2nd attribute)",
             "domain": "https://example-client.com/"
         }
-    }
+    },
+    
+    // optional (specify either both or none)
+    // if present, enables TLS
+    "tls_cert": "/path/to/cert.pem",
+    "tls_privkey": "/path/to/privkey.pem"
 }
 ```
 
 See also `conf.example.json`.
 
-Note that this server does not itself support TLS. In production, it *must* be run behind a reverse proxy that handles TLS for it.
+The TLS configuration fields are optional. If present, the server will accept TLS connection. If not, in production this server *must* be run behind a reverse proxy that handles TLS for it.
 
 ### Executing
 

@@ -26,6 +26,10 @@ type Configuration struct {
 	ListenAddress string            `json:"listen_addr"`
 	Port          uint              `json:"port"`
 	Clients       map[string]Client `json:"clients"`
+
+	// TLS configuration
+	TLSCertificate string `json:"tls_cert"`
+	TLSPrivateKey  string `json:"tls_privkey"`
 }
 
 type Client struct {
@@ -92,6 +96,11 @@ func checkConfig(conf *Configuration) {
 		if !strings.HasSuffix(conf.URL, "irma/") {
 			conf.URL += "irma/"
 		}
+	}
+
+	if (conf.TLSPrivateKey != "" && conf.TLSCertificate == "") ||
+		(conf.TLSCertificate != "" && conf.TLSPrivateKey == "") {
+		die("either configure both or none of tls_cert and tls_privkey", nil)
 	}
 
 	if err := irmaserver.Initialize(conf.Configuration); err != nil {
