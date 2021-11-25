@@ -8,6 +8,9 @@
 
     "port": 1234,
     "clients": {
-        "foo": "bar.com"
+        "SecretPresharedToken": {
+            "name": "bar.com",
+            "domain": "https://example.com"
+        }
     }
 }

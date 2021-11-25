@@ -25,7 +25,12 @@ type Configuration struct {
 
 	ListenAddress string            `json:"listen_addr"`
 	Port          uint              `json:"port"`
-	Clients       map[string]string `json:"clients"`
+	Clients       map[string]Client `json:"clients"`
+}
+
+type Client struct {
+	Name   string `json:"name"`
+	Domain string `json:"domain"`
 }
 
 func main() {
@@ -58,8 +63,11 @@ func checkConfig(conf *Configuration) {
 		die("no clients configured", nil)
 	}
 	for auth, client := range conf.Clients {
-		if client == "" {
+		if client.Name == "" {
 			die(fmt.Sprintf("client with authorization token %s has empty name", auth), nil)
+		}
+		if client.Domain == "" {
+			die(fmt.Sprintf("client %s has empty domain name", client.Name), nil)
 		}
 		if len(auth) < authTokenMinLength {
 			msg := fmt.Sprintf(
@@ -110,6 +118,14 @@ func checkConfig(conf *Configuration) {
 	if conf.UsernameLength == 0 {
 		conf.UsernameLength = usernameDefaultLength
 	}
+}
+
+func (conf *Configuration) clientDomains() []string {
+	domains := make([]string, 0, len(conf.Clients))
+	for _, client := range conf.Clients {
+		domains = append(domains, client.Domain)
+	}
+	return domains
 }
 
 func die(message string, err error) {

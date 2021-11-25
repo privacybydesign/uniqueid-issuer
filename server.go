@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/go-chi/chi"
+	"github.com/go-chi/cors"
 	irma "github.com/privacybydesign/irmago"
 	"github.com/privacybydesign/irmago/server"
 	"github.com/privacybydesign/irmago/server/irmaserver"
@@ -38,9 +39,18 @@ func start(conf *Configuration) error {
 	}
 
 	handler := chi.NewMux()
+
 	if s.conf.Verbose == 2 {
 		handler.Use(server.LogMiddleware("anonid-issuer", server.LogOptions{Response: true}))
 	}
+
+	handler.Use(cors.New(cors.Options{
+		AllowedOrigins:   s.conf.clientDomains(),
+		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "Cache-Control"},
+		AllowedMethods:   []string{http.MethodGet, http.MethodPost, http.MethodDelete},
+		AllowCredentials: true,
+	}).Handler)
+
 	handler.Mount("/irma/", irmaserver.HandlerFunc())
 	handler.Post("/session", s.handleSession)
 
@@ -57,7 +67,7 @@ func (s *Server) handleSession(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	s.conf.Logger.WithField("client", client).Info("handling request")
+	s.conf.Logger.WithField("client", client.Name).Info("handling request")
 
 	username, err := newUsername(s.conf.UsernameLength)
 	if err != nil {
@@ -66,7 +76,7 @@ func (s *Server) handleSession(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	bts, err := s.startSession(username, client)
+	bts, err := s.startSession(username, client.Name)
 	if err != nil {
 		_ = server.LogError(err)
 		w.WriteHeader(500)

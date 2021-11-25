@@ -42,7 +42,10 @@ Using a JSON configuration file:
     "listen_addr": "0.0.0.0",
     "port": 1234,
     "clients": {
-        "SecretPresharedToken": "Client name (appears in 2nd attribute)"
+        "SecretPresharedToken": {
+            "name": "Client name (appears in 2nd attribute)",
+            "domain": "https://example-client.com/"
+        }
     }
 }
 ```
