@@ -124,7 +124,8 @@ func randomNumbers(length uint, max uint8) ([]uint8, error) {
 	)
 
 	for len(ints) < int(length) {
-		// generate a bunch of new random bytes if we've run out
+		// Generate a bunch of new random bytes if we've run out.
+		// We take 10 bytes every 10 iterations instead of 1 per iteration for efficiency.
 		if len(bts) == 0 {
 			bts = make([]byte, 10)
 			_, err := rand.Read(bts)
@@ -133,7 +134,7 @@ func randomNumbers(length uint, max uint8) ([]uint8, error) {
 			}
 		}
 
-		num, bts = bts[0], bts[1:] // pop off the first byte
+		num, bts = bts[0], bts[1:] // pop off the first byte, store it into num
 		num &= mask                // throw away unnecessary bits
 
 		if num >= max {
@@ -145,6 +146,8 @@ func randomNumbers(length uint, max uint8) ([]uint8, error) {
 	return ints, nil
 }
 
+// newUsername generates a new username, that is a random string, where each character from the
+// character set is chosen with equal probability.
 func newUsername(length uint) (string, error) {
 	r, err := randomNumbers(length, byte(len(usernameCharset)))
 	if err != nil {
