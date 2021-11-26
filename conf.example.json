@@ -1,0 +1,16 @@
+{
+    "production": false,
+    "enable_sse": true,
+    "verbose": 2,
+
+    "client_attr": "irma-demo.IRMATube.member.type",
+    "username_attr": "irma-demo.IRMATube.member.id",
+
+    "port": 1234,
+    "clients": {
+        "SecretPresharedToken": {
+            "name": "bar.com",
+            "domain": "https://example.com"
+        }
+    }
+}
