@@ -41,7 +41,7 @@ func start(conf *Configuration) error {
 	handler := chi.NewMux()
 
 	if s.conf.Verbose == 2 {
-		handler.Use(server.LogMiddleware("anonid-issuer", server.LogOptions{Response: true}))
+		handler.Use(server.LogMiddleware("unique-issuer", server.LogOptions{Response: true}))
 	}
 
 	handler.Use(cors.New(cors.Options{

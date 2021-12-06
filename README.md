@@ -1,4 +1,4 @@
-# AnonID issuer
+# UniqueID issuer
 
 An IRMA issuer of randomly generated usernames.
 
@@ -15,8 +15,8 @@ This project contains a HTTP server which issues an IRMA credential containing a
 ### Installing
 
 ```sh
-git clone github.com/privacybydesign/anonid-issuer
-cd anonid-issuer
+git clone github.com/privacybydesign/uniqueid-issuer
+cd uniqueid-issuer
 go install
 ```
 
@@ -34,8 +34,8 @@ Using a JSON configuration file:
 
     // Attribute IDs in which the username and client name are to be issued
     // Must be part of the same credential type
-    "username_attr": "irma-demo.anonid.anonid.username",
-    "client_attr": "irma-demo.anonid.anonid.website",
+    "username_attr": "irma-demo.sidn-pbdf.uniqueid.username",
+    "client_attr": "irma-demo.sidn-pbdf.uniqueid.website",
     
     "username_length": 12, // default value
 
@@ -62,5 +62,5 @@ The TLS configuration fields are optional. If present, the server will accept TL
 ### Executing
 
 ```
-anonid-issuer /path/to/config.json
+uniqueid-issuer /path/to/config.json
 ```
