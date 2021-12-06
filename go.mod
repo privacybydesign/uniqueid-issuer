@@ -1,4 +1,4 @@
-module github.com/privacybydesign/anonid-issuer
+module github.com/privacybydesign/uniqueid-issuer
 
 go 1.16
 
