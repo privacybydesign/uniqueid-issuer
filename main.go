@@ -28,8 +28,8 @@ type Configuration struct {
 	Clients       map[string]Client `json:"clients"`
 
 	// TLS configuration
-	TLSCertificate string `json:"tls_cert"`
-	TLSPrivateKey  string `json:"tls_privkey"`
+	TLSCertificateFile string `json:"tls_cert_file"`
+	TLSPrivateKeyFile  string `json:"tls_privkey_file"`
 }
 
 type Client struct {
@@ -98,9 +98,9 @@ func checkConfig(conf *Configuration) {
 		}
 	}
 
-	if (conf.TLSPrivateKey != "" && conf.TLSCertificate == "") ||
-		(conf.TLSCertificate != "" && conf.TLSPrivateKey == "") {
-		die("either configure both or none of tls_cert and tls_privkey", nil)
+	if (conf.TLSPrivateKeyFile != "" && conf.TLSCertificateFile == "") ||
+		(conf.TLSCertificateFile != "" && conf.TLSPrivateKeyFile == "") {
+		die("either configure both or none of tls_cert_file and tls_privkey_file", nil)
 	}
 
 	if err := irmaserver.Initialize(conf.Configuration); err != nil {

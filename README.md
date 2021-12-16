@@ -50,8 +50,8 @@ Using a JSON configuration file:
     
     // optional (specify either both or none)
     // if present, enables TLS
-    "tls_cert": "/path/to/cert.pem",
-    "tls_privkey": "/path/to/privkey.pem"
+    "tls_cert_file": "/path/to/cert.pem",
+    "tls_privkey_file": "/path/to/privkey.pem"
 }
 ```
 

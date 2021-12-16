@@ -56,8 +56,8 @@ func start(conf *Configuration) error {
 
 	fullAddr := fmt.Sprintf("%s:%d", conf.ListenAddress, conf.Port)
 
-	if conf.TLSPrivateKey != "" {
-		return server.FilterStopError(http.ListenAndServeTLS(fullAddr, conf.TLSCertificate, conf.TLSPrivateKey, handler))
+	if conf.TLSPrivateKeyFile != "" {
+		return server.FilterStopError(http.ListenAndServeTLS(fullAddr, conf.TLSCertificateFile, conf.TLSPrivateKeyFile, handler))
 	}
 	return server.FilterStopError(http.ListenAndServe(fullAddr, handler))
 }
