@@ -3,8 +3,8 @@
     "enable_sse": true,
     "verbose": 2,
 
-    "client_attr": "irma-demo.IRMATube.member.type",
-    "username_attr": "irma-demo.IRMATube.member.id",
+    "logincode_attr": "irma-demo.sidn-pbdf.uniqueid.uniqueid",
+    "client_attr": "irma-demo.sidn-pbdf.uniqueid.organization",
 
     "port": 1234,
     "clients": {

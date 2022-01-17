@@ -16,17 +16,17 @@ import (
 )
 
 const (
-	// If d is the amount of possible usernames and n is the amount of generated usernames, then the
-	// chance p that one or more usernames is generated twice ore more is approximately the
+	// If d is the amount of possible login codes and n is the amount of generated login codes, then the
+	// chance p that one or more login codes is generated twice ore more is approximately the
 	// following, according to the generalized birthday problem
 	// (https://en.wikipedia.org/wiki/Birthday_problem):
 	//    p = 1 - e^(-n^2/(2d))
 	// 12 characters using 62 characters gives d = 62^12. For n = 10^6, this results in a chance of
 	// about 1.55 in 10 billion of duplicates:
 	//    p = 1 - e^(-(10^6)^2/(2*62^12)) = 1.55 * 10^(-10)
-	usernameDefaultLength = 12
+	loginCodeDefaultLength = 12
 
-	usernameCharset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+	loginCodeCharset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 )
 
 type Server struct {
@@ -41,7 +41,7 @@ func start(conf *Configuration) error {
 	handler := chi.NewMux()
 
 	if s.conf.Verbose == 2 {
-		handler.Use(server.LogMiddleware("unique-issuer", server.LogOptions{Response: true}))
+		handler.Use(server.LogMiddleware("uniqueid-issuer", server.LogOptions{Response: true}))
 	}
 
 	handler.Use(cors.New(cors.Options{
@@ -73,14 +73,14 @@ func (s *Server) handleSession(w http.ResponseWriter, r *http.Request) {
 
 	s.conf.Logger.WithField("client", client.Name).Info("handling request")
 
-	username, err := newUsername(s.conf.UsernameLength)
+	loginCode, err := newLoginCode(s.conf.LoginCodeLength)
 	if err != nil {
 		_ = server.LogError(err)
 		w.WriteHeader(500)
 		return
 	}
 
-	bts, err := s.startSession(username, client.Name)
+	bts, err := s.startSession(loginCode, client.Name)
 	if err != nil {
 		_ = server.LogError(err)
 		w.WriteHeader(500)
@@ -95,16 +95,16 @@ func (s *Server) handleSession(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (s *Server) startSession(username, client string) ([]byte, error) {
+func (s *Server) startSession(loginCode, client string) ([]byte, error) {
 	// Set the expiry to 10 years from now; these attributes don't really expire in the usual sense
 	validity := time.Now().AddDate(10, 0, 0)
-	credid := s.conf.UsernameAttr.CredentialTypeIdentifier()
+	credid := s.conf.LoginCodeAttr.CredentialTypeIdentifier()
 	request := irma.NewIssuanceRequest([]*irma.CredentialRequest{{
 		CredentialTypeID: credid,
 		Validity:         (*irma.Timestamp)(&validity),
 		Attributes: map[string]string{
-			s.conf.UsernameAttr.Name(): username,
-			s.conf.ClientAttr.Name():   client,
+			s.conf.LoginCodeAttr.Name(): loginCode,
+			s.conf.ClientAttr.Name():    client,
 		},
 	}})
 
@@ -160,17 +160,17 @@ func randomNumbers(length uint, max uint8) ([]uint8, error) {
 	return ints, nil
 }
 
-// newUsername generates a new username, that is a random string, where each character from the
+// newLoginCode generates a new login code, that is a random string, where each character from the
 // character set is chosen with equal probability.
-func newUsername(length uint) (string, error) {
-	r, err := randomNumbers(length, byte(len(usernameCharset)))
+func newLoginCode(length uint) (string, error) {
+	r, err := randomNumbers(length, byte(len(loginCodeCharset)))
 	if err != nil {
 		return "", err
 	}
 
 	b := make([]byte, length)
 	for i := range b {
-		b[i] = usernameCharset[r[i]]
+		b[i] = loginCodeCharset[r[i]]
 	}
 	return string(b), nil
 }

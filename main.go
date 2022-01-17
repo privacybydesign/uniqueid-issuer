@@ -18,10 +18,10 @@ const authTokenMinLength = 20
 type Configuration struct {
 	*server.Configuration
 
-	ClientAttr   irma.AttributeTypeIdentifier `json:"client_attr"`
-	UsernameAttr irma.AttributeTypeIdentifier `json:"username_attr"`
+	ClientAttr    irma.AttributeTypeIdentifier `json:"client_attr"`
+	LoginCodeAttr irma.AttributeTypeIdentifier `json:"logincode_attr"`
 
-	UsernameLength uint `json:"username_length"`
+	LoginCodeLength uint `json:"logincode_length"`
 
 	ListenAddress string            `json:"listen_addr"`
 	Port          uint              `json:"port"`
@@ -107,8 +107,8 @@ func checkConfig(conf *Configuration) {
 		die("failed to configure IRMA server", err)
 	}
 
-	if conf.ClientAttr.CredentialTypeIdentifier() != conf.UsernameAttr.CredentialTypeIdentifier() {
-		msg := fmt.Sprintf("attributes %s and %s do not belong to the same credential type", conf.ClientAttr, conf.UsernameAttr)
+	if conf.ClientAttr.CredentialTypeIdentifier() != conf.LoginCodeAttr.CredentialTypeIdentifier() {
+		msg := fmt.Sprintf("attributes %s and %s do not belong to the same credential type", conf.ClientAttr, conf.LoginCodeAttr)
 		die(msg, nil)
 	}
 
@@ -118,14 +118,14 @@ func checkConfig(conf *Configuration) {
 	if credtype == nil {
 		die("nonexistent credential type: "+credid.String(), nil)
 	}
-	for _, attr := range []irma.AttributeTypeIdentifier{conf.ClientAttr, conf.UsernameAttr} {
+	for _, attr := range []irma.AttributeTypeIdentifier{conf.ClientAttr, conf.LoginCodeAttr} {
 		if !credtype.ContainsAttribute(attr) {
 			die(fmt.Sprintf("credential type %s has no attribute %s", credid, attr.Name()), nil)
 		}
 	}
 
-	if conf.UsernameLength == 0 {
-		conf.UsernameLength = usernameDefaultLength
+	if conf.LoginCodeLength == 0 {
+		conf.LoginCodeLength = loginCodeDefaultLength
 	}
 }
 
