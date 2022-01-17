@@ -1,6 +1,6 @@
 # UniqueID issuer
 
-An IRMA issuer of randomly generated login codes.
+An IRMA issuer of randomly generated login codes that can be used as unique random usernames in for example a website.
 
 ## Description
 
