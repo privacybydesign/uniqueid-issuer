@@ -65,6 +65,10 @@ You can run the issuer as follows.
 
     uniqueid-issuer /path/to/config.json
 
+For a quick start, you can use the example configuration.
+
+    uniqueid-issuer ./conf.example.json
+
 Subsequently, you can start an issuing session using the `irma` CLI tool.
 
     go install github.com/privacybydesign/irmago/irma@master
