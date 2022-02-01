@@ -61,6 +61,15 @@ The TLS configuration fields are optional. If present, the server will accept TL
 
 ### Executing
 
-```
-uniqueid-issuer /path/to/config.json
-```
+You can run the issuer as follows.
+
+    uniqueid-issuer /path/to/config.json
+
+For a quick start, you can use the example configuration.
+
+    uniqueid-issuer ./conf.example.json
+
+Subsequently, you can start an issuing session using the `irma` CLI tool.
+
+    go install github.com/privacybydesign/irmago/irma@master
+    irma session --from-package $(curl -X POST -H "Authorization: SecretPresharedToken" http://localhost:1234/session)
