@@ -1,4 +1,4 @@
-# Workflow to check whether changes to master fulfill all requirements.
+# Workflow to check whether changes to the main branch fulfill all requirements.
 name: Status checks
 
 on:

@@ -1,4 +1,4 @@
-# Checks to weekly monitor the status of master.
+# Checks to weekly monitor the status of the main branch.
 name: Weekly checks
 
 on:
