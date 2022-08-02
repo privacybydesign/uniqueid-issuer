@@ -10,5 +10,5 @@ on:
 
 jobs:
 
-  analyse:
+  analyze:
     uses: ./.github/workflows/codeql-analysis.yml

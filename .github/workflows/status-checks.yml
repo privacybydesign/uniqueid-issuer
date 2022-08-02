@@ -50,7 +50,7 @@ jobs:
     - name: Run misspell
       run: misspell -error .
 
-  analyse:
+  analyze:
     # Require successful build to make sure analysis does not fail on syntax errors.
     needs: build
     uses: ./.github/workflows/codeql-analysis.yml
