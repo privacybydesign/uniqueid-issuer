@@ -66,7 +66,7 @@ func (s *Server) handleSession(w http.ResponseWriter, r *http.Request) {
 	auth := r.Header.Get("Authorization")
 	client, ok := s.conf.Clients[auth]
 	if !ok {
-		s.conf.Logger.WithField("authorization", auth).Warn("received request with unknown authorization")
+		s.conf.Logger.Warn("received request with unknown authorization")
 		w.WriteHeader(401)
 		return
 	}
