@@ -58,13 +58,13 @@ require (
 	github.com/mattn/go-isatty v0.0.22 // indirect
 	github.com/mgutz/ansi v0.0.0-20200706080929-d51e80ef957d // indirect
 	github.com/microsoft/go-mssqldb v1.10.0 // indirect
-	github.com/minio/blake2b-simd v0.0.0-20160723061019-3f5f724cb5b1 // indirect
 	github.com/minio/sha256-simd v1.0.1 // indirect
 	github.com/mr-tron/base58 v1.3.0 // indirect
-	github.com/multiformats/go-multihash v0.0.11 // indirect
+	github.com/multiformats/go-multihash v0.2.3 // indirect
+	github.com/multiformats/go-varint v0.1.0 // indirect
 	github.com/nightlyone/lockfile v1.0.0 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
-	github.com/privacybydesign/gabi v0.0.0-20221212095008-68a086907750 // indirect
+	github.com/privacybydesign/gabi v0.0.0-20260519111214-f8484462b684 // indirect
 	github.com/robfig/cron/v3 v3.0.1 // indirect
 	github.com/segmentio/asm v1.2.1 // indirect
 	github.com/shopspring/decimal v1.4.0 // indirect
@@ -90,4 +90,5 @@ require (
 	gorm.io/driver/postgres v1.6.0 // indirect
 	gorm.io/driver/sqlserver v1.6.3 // indirect
 	gorm.io/gorm v1.31.1 // indirect
+	lukechampine.com/blake3 v1.4.1 // indirect
 )
