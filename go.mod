@@ -5,7 +5,7 @@ go 1.25.7
 toolchain go1.25.10
 
 require (
-	github.com/go-chi/chi/v5 v5.2.5
+	github.com/go-chi/chi/v5 v5.3.0
 	github.com/go-chi/cors v1.2.2
 	github.com/privacybydesign/irmago v0.19.2
 )
