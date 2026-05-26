@@ -1,6 +1,6 @@
 # UniqueID issuer
 
-A [Yivi](https://yivi.app) (formerly IRMA) issuer for one specific credential: a random identifier, paired with the name of the organisation that issued it. Users keep that credential in their Yivi app and disclose it later whenever that organisation needs to recognise them as a returning user, without ever learning who they are.
+A [Yivi](https://yivi.app) (formerly IRMA) issuer for one specific credential: a random identifier, paired with the name of the organisation that issued it. Users keep that credential in their Yivi app and disclose it later whenever that organisation needs to recognise them as a returning user.
 
 In production the credential is `pbdf.sidn-pbdf.uniqueid` and this server is run by SIDN under the Privacy by Design Foundation. The source is open so the implementation can be audited, and so anyone can run their own instance against `irma-demo` for testing, or against `pbdf` with their own credential type if the Foundation has approved one.
 
@@ -12,7 +12,6 @@ The canonical application is login, replacing a username and password with a Yiv
 
 - Login or account creation without collecting personal data
 - Anonymous feedback or surveys where the same person can submit, edit, and follow up
-- Whistleblower or tip lines that need continuity of identity without identifying the tipster
 - Pseudonymous comments, voting, or recurring support tickets the user can come back to
 
 The flow is always the same:
@@ -21,6 +20,8 @@ The flow is always the same:
 2. The issuer starts an IRMA issuance session and returns a [session package](https://irma.app/docs/api-irma-server/#post-session). Your backend forwards it to your frontend.
 3. [`irma-frontend`](https://irma.app/docs/irma-frontend/) renders it as a QR code or universal link. The user scans it, and the Yivi app stores the credential. The credential contains a fresh random identifier and your organisation's name.
 4. Whenever the user comes back, you ask them to disclose the credential. Verifying the disclosure is the job of a separate IRMA verifier; that is not part of this project.
+
+This same server also hosts the `/irma/` endpoints that the user's Yivi app talks to in order to complete issuance, so you do not need to run a separate IRMA server alongside it.
 
 This project is not a verifier. If you only need to check attributes, run an IRMA server in verifier mode instead. It is also not a generic issuer. The only thing it ever issues is an `(identifier, organisation)` pair.
 
@@ -36,13 +37,13 @@ If you want to run your own deployment of this issuer, what you have to do depen
 
 - Against `irma-demo`: nothing. The private key ships with the scheme. The example config already points at it.
 - Against `pbdf`, re-issuing `pbdf.sidn-pbdf.uniqueid`: you need the production private key for the `sidn-pbdf` issuer, which is held by SIDN. In practice that means you are SIDN.
-- Against `pbdf` under your own organisation: register your own issuer (and probably your own credential type) with `pbdf` through the Privacy by Design Foundation. The current procedure is roughly to open a PR against `irma-demo` that defines your issuer and credential type, get it merged for testing, then sign a contract with the Foundation and submit your `pbdf` keypair through their onboarding. See [docs.yivi.app](https://docs.yivi.app/) for the up-to-date process. Once you are in, point `logincode_attr` and `client_attr` at the attributes inside your own credential type.
+- Against `pbdf` under your own organisation: register your own issuer (and probably your own credential type) with `pbdf` through the Privacy by Design Foundation. See [docs.yivi.app](https://docs.yivi.app/) for the current onboarding procedure; broadly, you register against `irma-demo` first, then sign a contract with the Foundation and submit a `pbdf` keypair. Once you are in, point `logincode_attr` and `client_attr` at the attributes inside your own credential type.
 
 The two attributes named in the config (`logincode_attr` and `client_attr`) must both live on the same credential type, and that credential type must exist in a scheme the embedded IRMA server has loaded. Otherwise the server refuses to start.
 
 ## Preshared tokens
 
-Each entry under `clients` in the config is a service that's allowed to use this issuer. The map key is that client's preshared token: the secret it sends in the `Authorization` header on `POST /session`. The value holds the organisation name (which goes into the issued credential as the `organization` attribute) and the domain (used to build the CORS allowlist).
+Each entry under `clients` in the config is a service that's allowed to use this issuer. The map key is that client's preshared token: the secret it sends in the `Authorization` header on `POST /session`. The value holds the organisation name (written into the credential as the attribute named by `client_attr`, which is `organization` on `pbdf.sidn-pbdf.uniqueid`) and the domain (used to build the CORS allowlist).
 
 ```json
 "clients": {
@@ -53,9 +54,9 @@ Each entry under `clients` in the config is a service that's allowed to use this
 }
 ```
 
-Tokens must be at least 20 characters. There is no upper bound. Generate them with a CSPRNG, for example `openssl rand -base64 32` or `head -c 32 /dev/urandom | base64`. Use one token per client. To rotate, add the new entry, deploy, then remove the old one.
+Tokens must be at least 20 bytes. There is no upper bound. Generate them with a CSPRNG, for example `openssl rand -base64 32` or `head -c 32 /dev/urandom | base64`. Use one token per client. To rotate, add the new entry, deploy, then remove the old one.
 
-A token is a shared secret between you (the operator) and one specific client. You generate it, hand it over out of band (password manager, secrets vault), and the client stores it on its own backend. It must never reach the browser. The `name` is what users will see in the credential as the issuing organisation, so use something recognisable. The `domain` is what the issuer puts in `Access-Control-Allow-Origin`, so it has to match the origin the browser uses.
+A token is a shared secret between you (the operator) and one specific client. You generate it, hand it over out of band (password manager, secrets vault), and the client stores it on its own backend. It must never reach the browser. The `name` is what users will see in the credential as the issuing organisation, so use something recognisable. The `domain` is added to the server's CORS allowlist: an incoming browser `Origin` must match it exactly (no wildcards, no subdomain matching, no trailing slash) for the request to get an `Access-Control-Allow-Origin` response back.
 
 On the client's side, implementing this is one request:
 
@@ -64,7 +65,7 @@ POST /session
 Authorization: <preshared token>
 ```
 
-The JSON response goes to `irma-frontend`. The token stays on the server.
+The token is sent as-is, not under a `Bearer` scheme. The JSON response goes to `irma-frontend`. The token stays on the server.
 
 ## Getting started
 
@@ -86,7 +87,7 @@ The config is a JSON file. Any field from the [IRMA server configuration struct]
     // https://pkg.go.dev/github.com/privacybydesign/irmago/server#Configuration
     // For example:
     "schemes_path": "/path/to/schemes", // optional
-    "url": "https://example.com/",      // public URL to this server
+    "url": "https://example.com/irma",  // public URL to this server; "/irma/" is appended if absent
 
     // Attribute IDs in which the login code and client name are to be issued.
     // Must belong to the same credential type, which must exist in a loaded scheme.
@@ -100,7 +101,7 @@ The config is a JSON file. Any field from the [IRMA server configuration struct]
     "clients": {
         "SecretPresharedToken": {
             "name": "Client name (appears in 2nd attribute)",
-            "domain": "https://example-client.com/"
+            "domain": "https://example-client.com" // no trailing slash; must match the browser's Origin exactly
         }
     },
 
