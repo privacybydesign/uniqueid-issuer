@@ -5,7 +5,7 @@
 
     "logincode_attr": "irma-demo.sidn-pbdf.uniqueid.uniqueid",
     "client_attr": "irma-demo.sidn-pbdf.uniqueid.organization",
-
+    "url": "http://localhost:1234/irma",
     "port": 1234,
     "clients": {
         "SecretPresharedToken": {
