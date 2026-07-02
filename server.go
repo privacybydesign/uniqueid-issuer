@@ -2,6 +2,7 @@ package main
 
 import (
 	"crypto/rand"
+	"crypto/subtle"
 	"encoding/json"
 	"fmt"
 	"math/bits"
@@ -62,9 +63,30 @@ func start(conf *Configuration) error {
 	return server.FilterStopError(http.ListenAndServe(fullAddr, handler))
 }
 
+// authenticate looks up the client belonging to the given Authorization header value. The
+// pre-shared token is compared with crypto/subtle.ConstantTimeCompare rather than used as a map
+// key, so the comparison time does not depend on the token contents (avoiding a timing oracle on
+// the shared bearer token). All configured tokens are compared without early return, so the number
+// of iterations does not leak which token matched either.
+func (conf *Configuration) authenticate(auth string) (Client, bool) {
+	authBytes := []byte(auth)
+
+	var (
+		match Client
+		found bool
+	)
+	for token, client := range conf.Clients {
+		if subtle.ConstantTimeCompare([]byte(token), authBytes) == 1 {
+			match = client
+			found = true
+		}
+	}
+	return match, found
+}
+
 func (s *Server) handleSession(w http.ResponseWriter, r *http.Request) {
 	auth := r.Header.Get("Authorization")
-	client, ok := s.conf.Clients[auth]
+	client, ok := s.conf.authenticate(auth)
 	if !ok {
 		s.conf.Logger.Warn("received request with unknown authorization")
 		w.WriteHeader(401)
