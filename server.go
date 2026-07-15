@@ -87,12 +87,20 @@ func (s *Server) handleSession(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.WriteHeader(200)
-	w.Header().Set("Content-Type", "application/json")
-	_, err = w.Write(bts)
-	if err != nil {
+	if err := writeJSON(w, http.StatusOK, bts); err != nil {
 		_ = server.LogError(err)
 	}
+}
+
+// writeJSON writes a JSON response body with the correct Content-Type header.
+// The header must be set before WriteHeader is called: once WriteHeader (or the
+// first Write) runs, the header map is flushed and any later Header().Set has no
+// effect, so the declared content type would be silently dropped.
+func writeJSON(w http.ResponseWriter, status int, bts []byte) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(status)
+	_, err := w.Write(bts)
+	return err
 }
 
 func (s *Server) startSession(loginCode, client string) ([]byte, error) {
