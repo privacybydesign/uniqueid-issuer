@@ -68,7 +68,7 @@ func checkConfig(conf *Configuration) {
 	}
 	for auth, client := range conf.Clients {
 		if client.Name == "" {
-			die(fmt.Sprintf("client with authorization token %s has empty name", auth), nil)
+			die(fmt.Sprintf("client with authorization token %s has empty name", redactToken(auth)), nil)
 		}
 		if client.Domain == "" {
 			die(fmt.Sprintf("client %s has empty domain name", client.Name), nil)
@@ -135,6 +135,17 @@ func (conf *Configuration) clientDomains() []string {
 		domains = append(domains, client.Domain)
 	}
 	return domains
+}
+
+// redactToken returns a truncated, non-sensitive representation of a pre-shared authorization
+// token, safe to include in log/error messages. It keeps at most the first 4 characters so the
+// offending client entry can still be identified, without ever writing the full secret to a log.
+func redactToken(token string) string {
+	const keep = 4
+	if len(token) <= keep {
+		return "****"
+	}
+	return token[:keep] + "****"
 }
 
 func die(message string, err error) {
