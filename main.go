@@ -112,7 +112,7 @@ func checkConfig(conf *Configuration) {
 		die(msg, nil)
 	}
 
-	irmaconf := conf.Configuration.IrmaConfiguration
+	irmaconf := conf.IrmaConfiguration
 	credid := conf.ClientAttr.CredentialTypeIdentifier()
 	credtype := irmaconf.CredentialTypes[credid]
 	if credtype == nil {
