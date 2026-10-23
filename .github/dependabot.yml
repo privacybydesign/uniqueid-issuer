@@ -1,6 +1,6 @@
-# Updates are grouped (one PR per ecosystem) and wait 7 days after a release
-# (cooldown) so compromised releases are usually yanked before they reach us.
-# Security updates are not delayed.
+# Updates are grouped per ecosystem (Go majors open separate PRs) and wait
+# 7 days after a release (cooldown) so compromised releases are usually
+# yanked before they reach us. Security updates are not delayed.
 version: 2
 updates:
   - package-ecosystem: github-actions # also bumps the shared workflows
