@@ -24,7 +24,11 @@ func TestWriteJSONSetsContentType(t *testing.T) {
 	// *after* WriteHeader (the original bug) would be missing here even though the
 	// recorder's live Header() map would still show it.
 	res := rec.Result()
-	defer res.Body.Close()
+	defer func() {
+		if err := res.Body.Close(); err != nil {
+			t.Errorf("closing response body: %v", err)
+		}
+	}()
 
 	if res.StatusCode != http.StatusOK {
 		t.Errorf("status code = %d, want %d", res.StatusCode, http.StatusOK)

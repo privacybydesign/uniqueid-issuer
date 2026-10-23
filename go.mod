@@ -1,6 +1,6 @@
 module github.com/privacybydesign/uniqueid-issuer
 
-go 1.26.4
+go 1.26.10
 
 require (
 	github.com/go-chi/chi/v5 v5.3.0
@@ -79,10 +79,10 @@ require (
 	go.etcd.io/bbolt v1.4.3 // indirect
 	go.uber.org/atomic v1.11.0 // indirect
 	golang.org/x/crypto v0.53.0 // indirect
-	golang.org/x/sync v0.21.0 // indirect
+	golang.org/x/sync v0.22.0 // indirect
 	golang.org/x/sys v0.46.0 // indirect
 	golang.org/x/term v0.44.0 // indirect
-	golang.org/x/text v0.38.0 // indirect
+	golang.org/x/text v0.41.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	gorm.io/driver/mysql v1.6.0 // indirect
 	gorm.io/driver/postgres v1.6.0 // indirect
