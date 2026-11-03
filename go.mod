@@ -3,7 +3,7 @@ module github.com/privacybydesign/uniqueid-issuer
 go 1.26.10
 
 require (
-	github.com/go-chi/chi/v5 v5.3.0
+	github.com/go-chi/chi/v5 v5.5.0
 	github.com/go-chi/cors v1.2.2
 	github.com/privacybydesign/irmago v0.19.2
 )
